@@ -1,6 +1,7 @@
 "use client";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 import {
   Card,
   CardHeader,
@@ -9,9 +10,20 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Github, Mail } from "lucide-react";
-
 export default function LoginForm() {
   const { data: session } = useSession();
+  useEffect(() => {
+    if (session?.user?.name && session?.user?.email && session?.user?.image) {
+      handleAddUser(
+        session.user.name,
+        session.user.email,
+        session.user.image,
+        session
+      );
+    } else if (session) {
+      console.error("Invalid user data:", session?.user);
+    }
+  }, [session]);
 
   return (
     <Card className="w-[350px]">
