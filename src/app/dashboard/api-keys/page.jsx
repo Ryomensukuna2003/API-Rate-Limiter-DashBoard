@@ -1,8 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Copy, MoreHorizontal } from 'lucide-react'
-import { Button } from "@/components/ui/button";
+
 import {
   Table,
   TableBody,
@@ -17,60 +16,53 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-
+import { Button } from "@/components/ui/button"
+import { Copy, MoreHorizontal } from "lucide-react"
+import { createApiKey } from "@/app/actions"
+import { CreateApiKeyForm } from "@/components/Layout/create-api-key-form"
 
 const apiKeys = [
-  {
-    name: "Production API Key",
-    key: "9e6d336a...af62",
-    createdAt: "10 May 2024",
-    updatedAt: "10 May 2025",
-    status: "active",
-  },
-  {
-    name: "Development API Key",
-    key: "8a2d834b...4c24",
-    createdAt: "15 Apr 2023",
-    updatedAt: "15 Apr 2024",
-    status: "inactive",
-  },
-  {
-    name: "Development test",
-    key: "4b6f472a...f5b6",
-    createdAt: "1 Mar 2023",
-    updatedAt: "1 Mar 2024",
-    status: "active",
-  },
-  {
-    name: "Production test",
-    key: "d4e3b829...a42f",
-    createdAt: "12 Dec 2022",
-    updatedAt: "12 Dec 2023",
-    status: "expired",
-  },
+
 ]
 
 export default function ApiKeysTable() {
-
   const [selectedRows, setSelectedRows] = React.useState(0)
+  const [keys, setKeys] = React.useState(apiKeys) // Initially use the static data
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text)
   }
 
-  return (
 
+  const handleDeleteKey = async (keyId) => {
+    const formData = new FormData()
+    formData.append("keyId", keyId)
+    const result = await deleteApiKey(formData)
+
+    if (result.success) {
+      setKeys(prev => prev.filter(key => key.id !== keyId))
+    } else {
+      console.error(result.error)
+    }
+  }
+
+  return (
     <div className="space-y-4 p-8">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Api Keys</h2>
-        <Button>+ Create Api Key</Button>
+        <h2 className="text-2xl font-bold">API Keys</h2>
+        <CreateApiKeyForm setKeys={setKeys} />
       </div>
+      {(keys.length === 0) &&
+        <div className="p-4 text-gray-500 bg-card rounded-md">
+          No API keys found. Click on the button above to create a new API key.
+        </div>
+      }
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead className="w-[200px]">Name</TableHead>
-              <TableHead>Api Key</TableHead>
+              <TableHead>API Key</TableHead>
               <TableHead>Created At</TableHead>
               <TableHead>Updated At</TableHead>
               <TableHead>Status</TableHead>
@@ -78,7 +70,7 @@ export default function ApiKeysTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {apiKeys.map((item) => (
+            {keys.map((item) => (
               <TableRow key={item.key}>
                 <TableCell>{item.name}</TableCell>
                 <TableCell className="font-mono">
@@ -111,16 +103,16 @@ export default function ApiKeysTable() {
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className="h-8 w-8 p-0"
-                      >
+                      <Button variant="ghost" className="h-8 w-8 p-0">
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem>Edit</DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-600">
+                      <DropdownMenuItem
+                        className="text-red-600"
+                        onClick={() => handleDeleteKey(item.id)}
+                      >
                         Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -131,9 +123,10 @@ export default function ApiKeysTable() {
           </TableBody>
         </Table>
       </div>
+
       <div className="flex items-center justify-between px-2">
         <p className="text-sm text-gray-500">
-          {selectedRows} of {apiKeys.length} row(s) selected.
+          {selectedRows} of {keys.length} row(s) selected.
         </p>
         <div className="space-x-2">
           <Button variant="outline" size="sm">
@@ -145,7 +138,5 @@ export default function ApiKeysTable() {
         </div>
       </div>
     </div>
-
   )
 }
-

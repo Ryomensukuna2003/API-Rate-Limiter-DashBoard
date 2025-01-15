@@ -1,27 +1,33 @@
 // lib/prisma.js
 import { PrismaClient } from "@prisma/client";
 
-const globalForPrisma = global;
+let prisma;
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient();
+if (typeof window === "undefined") {
+  const globalForPrisma = global;
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+  prisma = globalForPrisma.prisma ?? new PrismaClient();
 
-// Ensure the Prisma client is properly handling the connection lifecycle
-if (process.env.NODE_ENV === "production") {
-  prisma.$connect().catch((err) => {
-    console.error("Failed to connect to the database", err);
-  });
-} else {
-  prisma
-    .$connect()
-    .then(() => {
-      console.log("Connected to the database");
-    })
-    .catch((err) => {
+  if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+
+  // Ensure the Prisma client is properly handling the connection lifecycle
+  if (process.env.NODE_ENV === "production") {
+    prisma.$connect().catch((err) => {
       console.error("Failed to connect to the database", err);
     });
-  process.on("exit", () => {
-    prisma.$disconnect();
-  });
+  } else {
+    prisma
+      .$connect()
+      .then(() => {
+        console.log("Connected to the database");
+      })
+      .catch((err) => {
+        console.error("Failed to connect to the database", err);
+      });
+    process.on("exit", () => {
+      prisma.$disconnect();
+    });
+  }
 }
+
+export { prisma };

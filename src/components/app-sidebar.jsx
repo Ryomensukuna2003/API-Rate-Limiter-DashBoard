@@ -4,7 +4,7 @@ import * as React from "react"
 import {
   BookOpen,
   Bot,
-  Command,
+  Webhook,
   Frame,
   LifeBuoy,
   Map,
@@ -38,23 +38,23 @@ const data = {
   navMain: [
     {
       title: "API Keys",
-      url: "dashboard/api-keys",
+      url: "api-keys",
       icon: SquareTerminal,
       isActive: true,
     },
     {
       title: "Logs",
-      url: "dashboard/logs",
+      url: "logs",
       icon: Bot,
     },
     {
       title: "Errors",
-      url: "dashboard/errors",
+      url: "errors",
       icon: BookOpen,
     },
     {
       title: "Settings",
-      url: "dashboard/settings",
+      url: "settings",
       icon: Settings2,
     },
   ],
@@ -91,7 +91,7 @@ export function AppSidebar({
               <a href="/dashboard">
                 <div
                   className="flex aspect-square bg-card size-8  items-center justify-center rounded-lg  text-sidebar-primary-foreground">
-                  <Command className="size-4 " />
+                  <Webhook className="size-4 text-foreground" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">API Rate Limiter</span>
